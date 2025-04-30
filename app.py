@@ -1,84 +1,92 @@
 import os
+import json
+import platform
 import streamlit as st
+import paho.mqtt.client as paho
 from bokeh.models.widgets import Button
 from bokeh.models import CustomJS
 from streamlit_bokeh_events import streamlit_bokeh_events
 from PIL import Image
-import time
-import glob
-import paho.mqtt.client as paho
-import json
-from gtts import gTTS
-from googletrans import Translator
 
-def on_publish(client,userdata,result):             #create function for callback
-    print("el dato ha sido publicado \n")
+# Configuración de la página
+st.set_page_config(
+    page_title="Control por Voz",
+    page_icon="🎤",
+    layout="centered"
+)
+
+# Estilos minimalistas
+st.markdown("""
+<style>
+  body { background-color: #f0f0f0; color: #333333; }
+  .block-container { max-width: 600px; margin: auto; padding: 2rem; background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  h1, h2, h3 { color: #111111; }
+  .stButton > button { background-color: #0066cc; color: #ffffff; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 1rem; transition: background-color 0.2s; }
+  .stButton > button:hover { background-color: #005bb5; }
+  .message-count { font-size: 1.25rem; margin-top: 1.5rem; text-align: center; color: #555555; }
+  img { display: block; margin-left: auto; margin-right: auto; border-radius: 8px; }
+</style>
+""", unsafe_allow_html=True)
+
+# Título
+st.title("🎤 Control por Voz Minimalista")
+st.subheader("Presiona el botón y habla")
+
+# Imagen central
+if os.path.exists("voice_ctrl.jpg"):
+    img = Image.open("voice_ctrl.jpg")
+    st.image(img, width=200)
+
+# Inicializar contador de mensajes
+if 'message_count' not in st.session_state:
+    st.session_state.message_count = 0
+
+# Datos de conexión MQTT
+broker = "157.230.214.127"
+port = 1883
+
+# Callback de publicación MQTT
+def on_publish(client, userdata, result):
     pass
 
-def on_message(client, userdata, message):
-    global message_received
-    time.sleep(2)
-    message_received=str(message.payload.decode("utf-8"))
-    st.write(message_received)
+# Configurar cliente MQTT
+client = paho.Client("StreamlitVoiceClient")
+client.on_publish = on_publish
 
-broker="157.230.214.127"
-port=1883
-client1= paho.Client("NicoRawBe")
-client1.on_message = on_message
-
-
-
-st.title("INTERFACES MULTIMODALES")
-st.subheader("CONTROL POR VOZ")
-
-image = Image.open('voice_ctrl.jpg')
-
-st.image(image, width=200)
-
-
-
-
-st.write("Toca el Botón y habla ")
-
-stt_button = Button(label=" Inicio ", width=200)
-
-stt_button.js_on_event("button_click", CustomJS(code="""
-    var recognition = new webkitSpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
- 
-    recognition.onresult = function (e) {
-        var value = "";
-        for (var i = e.resultIndex; i < e.results.length; ++i) {
-            if (e.results[i].isFinal) {
-                value += e.results[i][0].transcript;
-            }
-        }
-        if ( value != "") {
-            document.dispatchEvent(new CustomEvent("GET_TEXT", {detail: value}));
-        }
-    }
+# Botón de reconocimiento de voz
+voice_btn = Button(label="🎤 Iniciar", width=200, height=50)
+voice_btn.js_on_event("button_click", CustomJS(code="""
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new Recognition();
+    recognition.interimResults = false;
+    recognition.onresult = e => {
+        const text = e.results[0][0].transcript;
+        document.dispatchEvent(new CustomEvent('GET_TEXT', {detail: text}));
+    };
     recognition.start();
-    """))
+"""))
 
+# Escuchar eventos de voz
 result = streamlit_bokeh_events(
-    stt_button,
+    voice_btn,
     events="GET_TEXT",
-    key="listen",
-    refresh_on_update=False,
+    key="voice_event",
+    debounce_time=0,
     override_height=75,
-    debounce_time=0)
+)
 
-if result:
-    if "GET_TEXT" in result:
-        st.write(result.get("GET_TEXT"))
-        client1.on_publish = on_publish                            
-        client1.connect(broker,port)  
-        message =json.dumps({"Act1":result.get("GET_TEXT").strip()})
-        ret= client1.publish("voiceNicoR", message)
+# Procesar y publicar texto reconocido
+def publish_and_count(text):
+    st.write(f"**Tú dijiste:** {text}")
+    payload = json.dumps({"Act1": text})
+    client.connect(broker, port)
+    client.publish("voiceNicoR", payload)
+    st.success("Mensaje enviado!")
+    st.session_state.message_count += 1
 
-    
-    try:
-        os.mkdir("temp")
-    except:
-        pass
+if result and 'GET_TEXT' in result:
+    text = result['GET_TEXT'].strip()
+    publish_and_count(text)
+
+# Mostrar contador de mensajes
+st.markdown(f"<div class='message-count'>Mensajes enviados: {st.session_state.message_count}</div>", unsafe_allow_html=True)
