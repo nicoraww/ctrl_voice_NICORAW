@@ -18,7 +18,7 @@ st.set_page_config(
 # Estilos minimalistas
 st.markdown("""
 <style>
-  body { background-color: #000000; color: #000000; }
+  body { background-color: #ffffff; color: #000000; }
   .block-container { max-width: 600px; margin: auto; padding: 2rem; background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
   h1, h2, h3 { color: #000000; }
   .stButton > button { background-color: #0066cc; color: #ffffff; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 1rem; transition: background-color 0.2s; }
