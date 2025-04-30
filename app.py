@@ -26,7 +26,7 @@ st.markdown("""
   .message-count { font-size: 1.25rem; margin-top: 1.5rem; text-align: center; color: #000000; }
   img { display: block; margin-left: auto; margin-right: auto; border-radius: 8px; }
 </style>
-""", unsafe_allow_html=True), unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # Título
 st.title("🎤 Control por Voz Minimalista")
