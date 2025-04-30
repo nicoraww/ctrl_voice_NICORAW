@@ -18,15 +18,15 @@ st.set_page_config(
 # Estilos minimalistas
 st.markdown("""
 <style>
-  body { background-color: #f0f0f0; color: #333333; }
+  body { background-color: #f0f0f0; color: #000000; }
   .block-container { max-width: 600px; margin: auto; padding: 2rem; background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-  h1, h2, h3 { color: #111111; }
+  h1, h2, h3 { color: #000000; }
   .stButton > button { background-color: #0066cc; color: #ffffff; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 1rem; transition: background-color 0.2s; }
   .stButton > button:hover { background-color: #005bb5; }
-  .message-count { font-size: 1.25rem; margin-top: 1.5rem; text-align: center; color: #555555; }
+  .message-count { font-size: 1.25rem; margin-top: 1.5rem; text-align: center; color: #000000; }
   img { display: block; margin-left: auto; margin-right: auto; border-radius: 8px; }
 </style>
-""", unsafe_allow_html=True)
+""", unsafe_allow_html=True), unsafe_allow_html=True)
 
 # Título
 st.title("🎤 Control por Voz Minimalista")
