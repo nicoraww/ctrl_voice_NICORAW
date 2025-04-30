@@ -23,7 +23,7 @@ st.markdown("""
   h1, h2, h3 { color: #000000; }
   .stButton > button { background-color: #0066cc; color: #ffffff; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 1rem; transition: background-color 0.2s; }
   .stButton > button:hover { background-color: #005bb5; }
-  .message-count { font-size: 1.25rem; margin-top: 1.5rem; text-align: center; color: #000000; }
+  .message-count { font-size: 1.25rem; margin-top: 1.5rem; text-align: center; color: #ffffff; }
   img { display: block; margin-left: auto; margin-right: auto; border-radius: 8px; }
 </style>
 """, unsafe_allow_html=True)
